@@ -1,1 +1,1 @@
-/usr/bin/c++      CMakeFiles/sunnet.dir/src/Sunnet.cpp.o CMakeFiles/sunnet.dir/src/Worker.cpp.o CMakeFiles/sunnet.dir/src/main.cpp.o  -o sunnet 
+/usr/bin/c++      CMakeFiles/sunnet.dir/src/Sunnet.cpp.o CMakeFiles/sunnet.dir/src/Worker.cpp.o CMakeFiles/sunnet.dir/src/main.cpp.o  -o sunnet -lpthread 

@@ -12,4 +12,4 @@ add_definitions(-std=c++11)
 add_executable(sunnet ${DIR_SRCS})
 #库文件
 find_package(Threads)
-target_link_libraries(sunnet ${cmake_THREAD_LIBS_INIT})
+target_link_libraries(sunnet ${CMAKE_THREAD_LIBS_INIT})
