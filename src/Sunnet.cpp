@@ -25,3 +25,9 @@ void Sunnet::StartWorker(){
         
     }
 }
+//等待
+void Sunnet::Wait(){
+    if(workerThreads[0]){
+        workerThreads[0]->join();
+    }
+}
