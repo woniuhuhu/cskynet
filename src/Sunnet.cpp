@@ -9,6 +9,14 @@ Sunnet::Sunnet(){
 //开启系统
 void Sunnet::Start(){
     cout<<"hello sunnet~!"<<endl;
+    //开启Worker
+    StartWorker();
+}
+//等待
+void Sunnet::Wait(){
+    if (workerThreads[0]){
+        workerThreads[0]->join();
+    }
 }
 //开启worker线程
 void Sunnet::StartWorker(){
@@ -20,8 +28,8 @@ void Sunnet::StartWorker(){
         //创建线程
         thread* wt = new thread(*worker);
         //添加到数组
-        workers.push_back(worker)
-        workerThread.push_back(wt);
+        workers.push_back(worker);
+        workerThreads.push_back(wt);
         
     }
 }

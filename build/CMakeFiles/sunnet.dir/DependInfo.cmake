@@ -4,8 +4,9 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/woniuhuhu/jianghui/cskynet/src/Sunnet.cpp" "/home/woniuhuhu/jianghui/cskynet/build/CMakeFiles/sunnet.dir/src/Sunnet.cpp.o"
-  "/home/woniuhuhu/jianghui/cskynet/src/main.cpp" "/home/woniuhuhu/jianghui/cskynet/build/CMakeFiles/sunnet.dir/src/main.cpp.o"
+  "/home/jh/cskynet/src/Sunnet.cpp" "/home/jh/cskynet/build/CMakeFiles/sunnet.dir/src/Sunnet.cpp.o"
+  "/home/jh/cskynet/src/Worker.cpp" "/home/jh/cskynet/build/CMakeFiles/sunnet.dir/src/Worker.cpp.o"
+  "/home/jh/cskynet/src/main.cpp" "/home/jh/cskynet/build/CMakeFiles/sunnet.dir/src/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
