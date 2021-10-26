@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -16,21 +16,9 @@ Worker.h
 thread
 -
 
-/home/jh/cskynet/src/Sunnet.cpp
+/home/woniuhuhu/jianghui/cskynet/src/Sunnet.cpp
 iostream
 -
 Sunnet.h
-/home/jh/cskynet/src/Sunnet.h
-
-/home/jh/cskynet/src/Worker.cpp
-iostream
--
-unistd.h
--
-Worker.h
-/home/jh/cskynet/src/Worker.h
-
-/home/jh/cskynet/src/main.cpp
-Sunnet.h
-/home/jh/cskynet/src/Sunnet.h
+/home/woniuhuhu/jianghui/cskynet/src/Sunnet.h
 

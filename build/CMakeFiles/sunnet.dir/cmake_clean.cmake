@@ -2,8 +2,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/sunnet.dir/src/Sunnet.cpp.o"
   "CMakeFiles/sunnet.dir/src/Worker.cpp.o"
   "CMakeFiles/sunnet.dir/src/main.cpp.o"
-  "sunnet.pdb"
   "sunnet"
+  "sunnet.pdb"
 )
 
 # Per-language clean rules from dependency scanning.
