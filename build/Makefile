@@ -123,6 +123,33 @@ sunnet/fast:
 	$(MAKE) -f CMakeFiles/sunnet.dir/build.make CMakeFiles/sunnet.dir/build
 .PHONY : sunnet/fast
 
+src/Service.o: src/Service.cpp.o
+
+.PHONY : src/Service.o
+
+# target to build an object file
+src/Service.cpp.o:
+	$(MAKE) -f CMakeFiles/sunnet.dir/build.make CMakeFiles/sunnet.dir/src/Service.cpp.o
+.PHONY : src/Service.cpp.o
+
+src/Service.i: src/Service.cpp.i
+
+.PHONY : src/Service.i
+
+# target to preprocess a source file
+src/Service.cpp.i:
+	$(MAKE) -f CMakeFiles/sunnet.dir/build.make CMakeFiles/sunnet.dir/src/Service.cpp.i
+.PHONY : src/Service.cpp.i
+
+src/Service.s: src/Service.cpp.s
+
+.PHONY : src/Service.s
+
+# target to generate assembly for a file
+src/Service.cpp.s:
+	$(MAKE) -f CMakeFiles/sunnet.dir/build.make CMakeFiles/sunnet.dir/src/Service.cpp.s
+.PHONY : src/Service.cpp.s
+
 src/Sunnet.o: src/Sunnet.cpp.o
 
 .PHONY : src/Sunnet.o
@@ -213,6 +240,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... sunnet"
+	@echo "... src/Service.o"
+	@echo "... src/Service.i"
+	@echo "... src/Service.s"
 	@echo "... src/Sunnet.o"
 	@echo "... src/Sunnet.i"
 	@echo "... src/Sunnet.s"

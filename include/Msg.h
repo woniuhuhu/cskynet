@@ -5,7 +5,7 @@ using namespace std;
 class BaseMsg{
     public :
         enum TYPE {  //消息类型 枚举
-            SERVICE = 1;
+            SERVICE = 1,
         };
         uint8_t type; //消息类型
         char load[999999]{};//用于检测内存泄漏，仅作为调试
