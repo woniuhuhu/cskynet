@@ -150,6 +150,33 @@ src/Service.cpp.s:
 	$(MAKE) -f CMakeFiles/sunnet.dir/build.make CMakeFiles/sunnet.dir/src/Service.cpp.s
 .PHONY : src/Service.cpp.s
 
+src/SocketWorker.o: src/SocketWorker.cpp.o
+
+.PHONY : src/SocketWorker.o
+
+# target to build an object file
+src/SocketWorker.cpp.o:
+	$(MAKE) -f CMakeFiles/sunnet.dir/build.make CMakeFiles/sunnet.dir/src/SocketWorker.cpp.o
+.PHONY : src/SocketWorker.cpp.o
+
+src/SocketWorker.i: src/SocketWorker.cpp.i
+
+.PHONY : src/SocketWorker.i
+
+# target to preprocess a source file
+src/SocketWorker.cpp.i:
+	$(MAKE) -f CMakeFiles/sunnet.dir/build.make CMakeFiles/sunnet.dir/src/SocketWorker.cpp.i
+.PHONY : src/SocketWorker.cpp.i
+
+src/SocketWorker.s: src/SocketWorker.cpp.s
+
+.PHONY : src/SocketWorker.s
+
+# target to generate assembly for a file
+src/SocketWorker.cpp.s:
+	$(MAKE) -f CMakeFiles/sunnet.dir/build.make CMakeFiles/sunnet.dir/src/SocketWorker.cpp.s
+.PHONY : src/SocketWorker.cpp.s
+
 src/Sunnet.o: src/Sunnet.cpp.o
 
 .PHONY : src/Sunnet.o
@@ -243,6 +270,9 @@ help:
 	@echo "... src/Service.o"
 	@echo "... src/Service.i"
 	@echo "... src/Service.s"
+	@echo "... src/SocketWorker.o"
+	@echo "... src/SocketWorker.i"
+	@echo "... src/SocketWorker.s"
 	@echo "... src/Sunnet.o"
 	@echo "... src/Sunnet.i"
 	@echo "... src/Sunnet.s"

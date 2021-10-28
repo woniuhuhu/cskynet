@@ -14,8 +14,13 @@ void Sunnet::Start()
     //锁
     pthread_rwlock_init(&servicesLock, NULL);
     pthread_spin_init(&globalLock,PTHREAD_PROCESS_PRIVATE);
+    pthread_cond_init(&sleepCond,NULL);
+    pthread_mutex_init(&sleepMtx,NULL);
+    assert(pthread_rwlock_init(&connsLock,NULL)==0);//这里暂时没搞懂
     //开启worker
     StartWorker();
+    //开启Socket线程
+    StartSocket();
 }
 //新建服务
 uint32_t Sunnet::NewService(shared_ptr<string> type)
@@ -140,6 +145,73 @@ void Sunnet::Send(uint32_t toId,shared_ptr<BaseMsg> msg){
 		}
 	}
 	pthread_spin_unlock(&toSrv->inGlobalLock);
-	//唤起进程（后面实现）
+	//唤起进程,不放在临界区里面
+    if(hasPush){
+        CheckAndWeakUp();
+    }
+}
+//Worker线程调用，进入休眠
+void Sunnet::WorkerWait(){
+    pthread_mutex_lock(&sleepMtx);
+    sleepCount++;
+    pthread_cond_wait(&sleepCond,&sleepMtx);
+    sleepCount--;
+    pthread_mutex_unlock(&sleepMtx);
+}
+//检查并唤醒线程
+void Sunnet::CheckAndWeakUp(){
+    //unsafe
+    if(sleepCount==0){
+        return;
+    }
+    if(WORKER_NUM-sleepCount <= globalLen){
+        cout<<"weakup"<<endl;
+        pthread_cond_signal(&sleepCond);
+    }
+}
+//开启Socket线程
+void Sunnet::StartSocket(){
+    //创建线程对象
+    socketWorker = new SocketWorker();
+    //初始化
+    socketWorker->Init();
+    //创建线程
+    socketThread = new thread(*socketWorker);
+}
+//添加链接
+int Sunnet::AddConn(int fd,uint32_t id,Conn::TYPE type){
+    auto conn = make_shared<Conn>();
+    conn->fd = fd;
+    conn->serviceId = id;
+    conn->type = type;
+    pthread_rwlock_wrlock(&connsLock);
+    {
+        conns.emplace(fd,conn);
+    }
+    pthread_rwlock_unlock(&connsLock);
+    return fd;
+}
+//通过id查找链接
+shared_ptr<Conn> Sunnet::GetConn(int fd){
+    shared_ptr<Conn> conn = NULL;
+    pthread_rwlock_rdlock(&connsLock);
+    {
+        unordered_map<uint32_t,shared_ptr<Conn>>::iterator iter = conns.find(fd);
+        if(iter != conns.end()){  //end()指向末尾的迭代器
+            conn = iter->second  //first 为键 second 为值
+        }
+    }
+    pthread_rwlock_unlock(&connsLock);
+    return conn;
+}
+//删除链接
+bool Sunnet::RemoveConn(int fd){
+    int result;
+    pthread_rwlock_wrlock(&connsLock);
+    {
+        result = conns.erase(fd);
+    }
+    pthread_rwlock_unlock(&connsLock);
+    return result == 1;
 }
 	

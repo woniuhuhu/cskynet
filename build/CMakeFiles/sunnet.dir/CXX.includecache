@@ -18,6 +18,8 @@ thread
 Msg.h
 ../include/Msg.h
 
+../include/SocketWorker.h
+
 ../include/Sunnet.h
 Service.h
 ../include/Service.h
@@ -27,6 +29,8 @@ vector
 -
 Worker.h
 ../include/Worker.h
+SocketWorker.h
+../include/SocketWorker.h
 
 ../include/Worker.h
 thread
