@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Sunnet.h"
+#include <assert.h>
 using namespace std;
 //单例
 Sunnet *Sunnet::inst;
@@ -198,7 +199,7 @@ shared_ptr<Conn> Sunnet::GetConn(int fd){
     {
         unordered_map<uint32_t,shared_ptr<Conn>>::iterator iter = conns.find(fd);
         if(iter != conns.end()){  //end()指向末尾的迭代器
-            conn = iter->second  //first 为键 second 为值
+            conn = iter->second;  //first 为键 second 为值
         }
     }
     pthread_rwlock_unlock(&connsLock);

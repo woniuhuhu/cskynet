@@ -12,7 +12,7 @@ class SocketWorker {
         void ModifyEvent(int fd,bool epollOut);
     private:
         //epoll描述符
-        int epollFD;
+        int epollFd;
         void OnEvent(epoll_event ev);
         void OnAccept(shared_ptr<Conn> conn);
         void OnRW(shared_ptr<Conn> conn,bool r,bool w);
