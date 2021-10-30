@@ -38,6 +38,9 @@ class Sunnet{
         int AddConn(int fd,uint32_t id,Conn::TYPE type);
         shared_ptr<Conn> GetConn(int fd);
         bool RemoveConn(int fd);
+        //网络连接操作接口
+        int Listen(uint32_t port,uint32_t serviceId);
+        void CloseConn(uint32_t fd);
     private:
         //获取服务
         shared_ptr <Service> GetService(uint32_t id);

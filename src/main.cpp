@@ -1,4 +1,10 @@
 #include "Sunnet.h"
+#include <unistd.h>
+void TestSocketCtrl(){
+    int fd = Sunnet::inst->Listen(8001, 1);
+    usleep(15 * 100000);
+    Sunnet::inst->CloseConn(fd);
+}
 void test(){
     auto pingType = make_shared<string>("ping");
     uint32_t ping1 = Sunnet::inst->NewService(pingType);
@@ -11,8 +17,10 @@ void test(){
 }
 int main(){
     new Sunnet();
+    
     Sunnet::inst->Start();
-    test();
+    TestSocketCtrl();
+    // test();
     //开启系统后的一些逻辑
     Sunnet::inst->Wait();
     return 0;

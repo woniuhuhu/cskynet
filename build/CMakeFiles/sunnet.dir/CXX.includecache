@@ -48,11 +48,9 @@ thread
 Sunnet.h
 ../include/Sunnet.h
 
-/home/woniuhuhu/jianghui/cskynet/src/Sunnet.cpp
-iostream
--
+/home/woniuhuhu/jianghui/cskynet/src/main.cpp
 Sunnet.h
 /home/woniuhuhu/jianghui/cskynet/src/Sunnet.h
-assert.h
+unistd.h
 -
 
