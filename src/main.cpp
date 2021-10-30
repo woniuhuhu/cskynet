@@ -5,6 +5,10 @@ void TestSocketCtrl(){
     usleep(15 * 100000);
     Sunnet::inst->CloseConn(fd);
 }
+void TestEcho(){
+	auto t = make_shared<string>("gateway");
+	uint32_t geteway = Sunnet::inst->NewService(t);
+}
 void test(){
     auto pingType = make_shared<string>("ping");
     uint32_t ping1 = Sunnet::inst->NewService(pingType);
@@ -19,7 +23,8 @@ int main(){
     new Sunnet();
     
     Sunnet::inst->Start();
-    TestSocketCtrl();
+	TestEcho();
+    //TestSocketCtrl();
     // test();
     //开启系统后的一些逻辑
     Sunnet::inst->Wait();

@@ -10,7 +10,11 @@ CMakeFiles/sunnet.dir/src/Service.cpp.o: ../include/Worker.h
 CMakeFiles/sunnet.dir/src/Service.cpp.o: ../src/Service.cpp
 
 CMakeFiles/sunnet.dir/src/SocketWorker.cpp.o: ../include/Conn.h
+CMakeFiles/sunnet.dir/src/SocketWorker.cpp.o: ../include/Msg.h
+CMakeFiles/sunnet.dir/src/SocketWorker.cpp.o: ../include/Service.h
 CMakeFiles/sunnet.dir/src/SocketWorker.cpp.o: ../include/SocketWorker.h
+CMakeFiles/sunnet.dir/src/SocketWorker.cpp.o: ../include/Sunnet.h
+CMakeFiles/sunnet.dir/src/SocketWorker.cpp.o: ../include/Worker.h
 CMakeFiles/sunnet.dir/src/SocketWorker.cpp.o: ../src/SocketWorker.cpp
 
 CMakeFiles/sunnet.dir/src/Sunnet.cpp.o: ../include/Conn.h

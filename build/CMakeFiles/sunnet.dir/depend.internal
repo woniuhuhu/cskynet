@@ -11,7 +11,11 @@ CMakeFiles/sunnet.dir/src/Service.cpp.o
  /home/woniuhuhu/jianghui/cskynet/src/Service.cpp
 CMakeFiles/sunnet.dir/src/SocketWorker.cpp.o
  ../include/Conn.h
+ ../include/Msg.h
+ ../include/Service.h
  ../include/SocketWorker.h
+ ../include/Sunnet.h
+ ../include/Worker.h
  /home/woniuhuhu/jianghui/cskynet/src/SocketWorker.cpp
 CMakeFiles/sunnet.dir/src/Sunnet.cpp.o
  ../include/Conn.h

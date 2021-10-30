@@ -1,6 +1,8 @@
 #include "Service.h"
 #include "Sunnet.h"
 #include <iostream>
+#include <unistd.h>
+#include <string.h>
 
 //构造函数
 Service::Service(){
@@ -18,8 +20,7 @@ void Service::PushMsg(shared_ptr <BaseMsg> msg){
 	pthread_spin_lock(&queueLock);
 	{
 		msgQueue.push(msg);
-
-}
+	}
 	pthread_spin_unlock(&queueLock);
 }
 //取出消息
@@ -39,20 +40,44 @@ shared_ptr <BaseMsg> Service::PopMsg(){
 //创建服务后触发
 void Service::OnInit(){
 	cout<<"["<<id<<"] OnInit"<<endl;
+	//开启监听
+	Sunnet::inst->Sunnet::Listen(8002,id);
 }
 //收到消息时触发
 void Service::OnMsg(shared_ptr<BaseMsg> msg){
+	//SOCKET_ACCEPT
+	if(msg->type == BaseMsg::TYPE::SOCKET_ACCEPT){
+		auto m = dynamic_pointer_cast<SocketAcceptMsg>(msg);
+		cout<<"new conn"<<m->clientFd<<endl;
+	}
+	//SOCKET_RW
+	if(msg->type == BaseMsg::TYPE::SOCKET_RW){
+		auto m = dynamic_pointer_cast<SocketRWMsg>(msg);
+		if(m->isRead){
+			char buff[512];
+			int len = read(m->fd,&buff,512);
+			if(len>0){
+				char writeBuff[3] = {'l','p','y'};
+				write(m->fd,&writeBuff,3);
+			}
+			else{
+				cout<<"close"<<m->fd<<strerror(errno)<<endl;
+				Sunnet::inst->CloseConn(m->fd);
+			}
+		}
+	}	
+}	
 	//测试用
-	if(msg->type == BaseMsg::TYPE::SERVICE){
-		auto m = dynamic_pointer_cast<ServiceMsg>(msg);
-		cout<<"["<<id<<"]  OnMsg"<<m->buff<<endl;
-		auto msgRet = Sunnet::inst->MakeMsg(id,new char[9999999]{'p','i','n','g','\0'},9999999);
-		Sunnet::inst->Send(m->source,msgRet);
-	}
-	else{
-		cout<<"["<<id<<"] OnMsg"<<endl;
-	}
-}
+//	if(msg->type == BaseMsg::TYPE::SERVICE){
+//		auto m = dynamic_pointer_cast<ServiceMsg>(msg);
+//		cout<<"["<<id<<"]  OnMsg"<<m->buff<<endl;
+//		auto msgRet = Sunnet::inst->MakeMsg(id,new char[9999999]{'p','i','n','g','\0'},9999999);
+//		Sunnet::inst->Send(m->source,msgRet);
+//	}
+//	else{
+//		cout<<"["<<id<<"] OnMsg"<<endl;
+//	}
+
 //推出消息时触发
 void Service::OnExit(){
 	cout<<"["<<id<<"] onExit"<<endl;
@@ -85,4 +110,3 @@ void Service::SetInGlobal(bool isIn){
 	}
 	pthread_spin_unlock(&inGlobalLock);
 }
-
