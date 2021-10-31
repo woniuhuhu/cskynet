@@ -19,6 +19,7 @@ void SocketWorker::operator()()
     while (true)
     {
         //阻塞等待
+        cout<<"socketwork operator()() 阻塞等待"<<endl;
         const int EVENT_SIZE = 64;
         struct epoll_event events[EVENT_SIZE];
         int eventCount = epoll_wait(epollFd, events, EVENT_SIZE, -1);
@@ -26,6 +27,7 @@ void SocketWorker::operator()()
         for (int i = 0; i < eventCount; i++)
         {
             epoll_event ev = events[i];
+            cout<<"socketwork operator()() epoll_wait取得事件："<<i<<endl;
             OnEvent(ev);
         }
     }
@@ -72,6 +74,7 @@ void SocketWorker::RemoveEvent(int fd)
 void SocketWorker::OnEvent(epoll_event ev)
 {
     int fd = ev.data.fd;
+    cout<<"epoll获得事件了 OnEvent()干活啦："<<fd<<endl;
     auto conn = Sunnet::inst->GetConn(fd);
     if (conn == NULL)
     {
@@ -105,7 +108,7 @@ void SocketWorker::OnEvent(epoll_event ev)
 //6-26
 void SocketWorker::OnAccept(shared_ptr<Conn> conn){
 	cout<<"OnAccept fd:"<<conn->fd<<endl;
-//步骤1：accept
+//步骤1：accept 有客户端连接时先accept接受它，操作系统创建一个新的套接字代表该客户端连接，返回给clientFd
 	int clientFd = accept(conn->fd,NULL,NULL);
 	if(clientFd<0){
 		cout<<"accept error"<<endl;	

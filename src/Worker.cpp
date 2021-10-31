@@ -4,11 +4,11 @@
 #include "Service.h"
 using namespace std;
 //线程函数
-void Worker::operator()()
+void Worker::operator()()  //重载括号操作符，对应线程执行代码
 {
     while (true)
     {
-        shared_ptr<Service> srv = Sunnet::inst->PopGlobalQueue();
+        shared_ptr<Service> srv = Sunnet::inst->PopGlobalQueue();//从全局服务队列里弹出一个服务来执行
         if (!srv)
         {
             Sunnet::inst->WorkerWait();

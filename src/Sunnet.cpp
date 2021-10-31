@@ -33,6 +33,7 @@ uint32_t Sunnet::NewService(shared_ptr<string> type)
 {
     auto srv = make_shared<Service>();
     srv->type = type;
+    //将服务插入哈希表
     pthread_rwlock_wrlock(&servicesLock);
     {
         srv->id = maxId;
@@ -121,7 +122,7 @@ void Sunnet::PushGlobalQueue(shared_ptr<Service> srv){
     }
     pthread_spin_unlock(&globalLock);
 }
-//5-42
+//5-42 仅仅测试用buff须由new产生
 shared_ptr<BaseMsg> Sunnet::MakeMsg(uint32_t source,char* buff,int len){
     auto msg = make_shared<ServiceMsg>();
     msg->type = BaseMsg::TYPE::SERVICE;
@@ -156,11 +157,11 @@ void Sunnet::Send(uint32_t toId,shared_ptr<BaseMsg> msg){
         CheckAndWeakUp();
     }
 }
-//Worker线程调用，进入休眠
+//Worker线程调用，进入休眠 加锁-》XXX-》等待-》XXX-》解锁
 void Sunnet::WorkerWait(){
     pthread_mutex_lock(&sleepMtx);
     sleepCount++;
-    pthread_cond_wait(&sleepCond,&sleepMtx);
+    pthread_cond_wait(&sleepCond,&sleepMtx);//条件变量API 运行到这里会睡眠等待唤醒
     sleepCount--;
     pthread_mutex_unlock(&sleepMtx);
 }

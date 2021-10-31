@@ -46,8 +46,8 @@ class Sunnet{
         shared_ptr <Service> GetService(uint32_t id);
         //工作线程
         int WORKER_NUM = 3;//工作线程数
-        vector <Worker*> workers;//worker对象
-        vector <thread*> workerThreads;//线程
+        vector <Worker*> workers;//创建一个worker对象
+        vector <thread*> workerThreads;//创建一条线程
         //开启工作线程
         void StartWorker();
         //全局队列

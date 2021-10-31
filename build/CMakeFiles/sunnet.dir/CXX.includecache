@@ -48,9 +48,21 @@ thread
 Sunnet.h
 ../include/Sunnet.h
 
-/home/woniuhuhu/jianghui/cskynet/src/main.cpp
-Sunnet.h
-/home/woniuhuhu/jianghui/cskynet/src/Sunnet.h
+/home/woniuhuhu/jianghui/cskynet/src/SocketWorker.cpp
+assert.h
+-
+SocketWorker.h
+/home/woniuhuhu/jianghui/cskynet/src/SocketWorker.h
+iostream
+-
 unistd.h
+-
+string.h
+-
+Sunnet.h
+-
+fcntl.h
+-
+sys/socket.h
 -
 
