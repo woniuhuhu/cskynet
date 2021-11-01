@@ -1,3 +1,0 @@
-/home/woniuhuhu/jianghui/cskynet/build/CMakeFiles/rebuild_cache.dir
-/home/woniuhuhu/jianghui/cskynet/build/CMakeFiles/edit_cache.dir
-/home/woniuhuhu/jianghui/cskynet/build/CMakeFiles/sunnet.dir
