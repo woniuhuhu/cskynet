@@ -19,7 +19,7 @@ void SocketWorker::operator()()
     while (true)
     {
         //阻塞等待
-        cout<<"socketwork operator()() 阻塞等待"<<endl;
+        cout << "socketwork operator()() 阻塞等待" << endl;
         const int EVENT_SIZE = 64;
         struct epoll_event events[EVENT_SIZE];
         int eventCount = epoll_wait(epollFd, events, EVENT_SIZE, -1);
@@ -27,7 +27,7 @@ void SocketWorker::operator()()
         for (int i = 0; i < eventCount; i++)
         {
             epoll_event ev = events[i];
-            cout<<"socketwork operator()() epoll_wait取得事件："<<i<<endl;
+            cout << "socketwork operator()() epoll_wait取得事件：" << i << endl;
             OnEvent(ev);
         }
     }
@@ -74,7 +74,7 @@ void SocketWorker::RemoveEvent(int fd)
 void SocketWorker::OnEvent(epoll_event ev)
 {
     int fd = ev.data.fd;
-    cout<<"epoll获得事件了 OnEvent()干活啦："<<fd<<endl;
+    cout << "epoll获得事件了 OnEvent()干活啦：" << fd << endl;
     auto conn = Sunnet::inst->GetConn(fd);
     if (conn == NULL)
     {
@@ -86,7 +86,7 @@ void SocketWorker::OnEvent(epoll_event ev)
     bool isWrite = ev.events & EPOLLOUT;
     bool isError = ev.events & EPOLLERR;
     //监听socket
-    if (conn->type==Conn::TYPE::LISTEN)
+    if (conn->type == Conn::TYPE::LISTEN)
     {
         if (isRead)
         {
@@ -94,50 +94,54 @@ void SocketWorker::OnEvent(epoll_event ev)
         }
     }
     //普通socket
-    else{
-        if(isRead||isWrite)
-		{
-            OnRW(conn,isRead,isWrite);
+    else
+    {
+        if (isRead || isWrite)
+        {
+            OnRW(conn, isRead, isWrite);
         }
-		if(isError)
-		{
-			cout<<"OnError fd: "<<conn->fd<<endl;
-		}
+        if (isError)
+        {
+            cout << "OnError fd: " << conn->fd << endl;
+        }
     }
 }
 //6-26
-void SocketWorker::OnAccept(shared_ptr<Conn> conn){
-	cout<<"OnAccept fd:"<<conn->fd<<endl;
-//步骤1：accept 有客户端连接时先accept接受它，操作系统创建一个新的套接字代表该客户端连接，返回给clientFd
-	int clientFd = accept(conn->fd,NULL,NULL);
-	if(clientFd<0){
-		cout<<"accept error"<<endl;	
-	}
-	//步骤2：设置非阻塞
-	fcntl(clientFd,F_SETFL,O_NONBLOCK);
-	//步骤3：添加连接对象
-	Sunnet::inst->AddConn(clientFd,conn->serviceId,Conn::TYPE::CLIENT);
-	//步骤4：添加到epoll监听列表
-	struct epoll_event ev;
-	ev.events = EPOLLIN|EPOLLET;
-	ev.data.fd = clientFd;
-	if(epoll_ctl(epollFd,EPOLL_CTL_ADD,clientFd,&ev)==-1)
-	{
-		cout<<"OnAccept epoll_ctl Fail: "<<strerror(errno)<<endl;
-	}
-	//步骤5：通知服务
-	auto msg = make_shared<SocketAcceptMsg>();
-	msg->type = BaseMsg::TYPE::SOCKET_ACCEPT;
-	msg->listenFd = conn->fd;
-	msg->clientFd = clientFd;
-	Sunnet::inst->Send(conn->serviceId,msg);
+void SocketWorker::OnAccept(shared_ptr<Conn> conn)
+{
+    cout << "OnAccept fd:" << conn->fd << endl;
+    //步骤1：accept 有客户端连接时先accept接受它，操作系统创建一个新的套接字代表该客户端连接，返回给clientFd
+    int clientFd = accept(conn->fd, NULL, NULL);
+    if (clientFd < 0)
+    {
+        cout << "accept error" << endl;
+    }
+    //步骤2：设置非阻塞
+    fcntl(clientFd, F_SETFL, O_NONBLOCK);
+    //步骤3：添加连接对象
+    Sunnet::inst->AddConn(clientFd, conn->serviceId, Conn::TYPE::CLIENT);
+    //步骤4：添加到epoll监听列表
+    struct epoll_event ev;
+    ev.events = EPOLLIN | EPOLLET;
+    ev.data.fd = clientFd;
+    if (epoll_ctl(epollFd, EPOLL_CTL_ADD, clientFd, &ev) == -1)
+    {
+        cout << "OnAccept epoll_ctl Fail: " << strerror(errno) << endl;
+    }
+    //步骤5：通知服务
+    auto msg = make_shared<SocketAcceptMsg>();
+    msg->type = BaseMsg::TYPE::SOCKET_ACCEPT;
+    msg->listenFd = conn->fd;
+    msg->clientFd = clientFd;
+    Sunnet::inst->Send(conn->serviceId, msg);
 }
 //6-27
-void SocketWorker::OnRW(shared_ptr<Conn> conn,bool r,bool w){
-	cout<<"OnRW fd:"<<conn->fd<<endl;
-	auto msg = make_shared<SocketRWMsg>();
-	msg->fd = conn->fd;
-	msg->isRead = r;
-	msg->isWrite = w;
-	Sunnet::inst->Send(conn->serviceId,msg);
+void SocketWorker::OnRW(shared_ptr<Conn> conn, bool r, bool w)
+{
+    cout << "OnRW fd:" << conn->fd << endl;
+    auto msg = make_shared<SocketRWMsg>();
+    msg->fd = conn->fd;
+    msg->isRead = r;
+    msg->isWrite = w;
+    Sunnet::inst->Send(conn->serviceId, msg);
 }

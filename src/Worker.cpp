@@ -4,17 +4,19 @@
 #include "Service.h"
 using namespace std;
 //线程函数
-void Worker::operator()()  //重载括号操作符，对应线程执行代码
+void Worker::operator()() //重载括号操作符，对应线程执行代码
 {
     while (true)
     {
-        shared_ptr<Service> srv = Sunnet::inst->PopGlobalQueue();//从全局服务队列里弹出一个服务来执行
+        shared_ptr<Service> srv = Sunnet::inst->PopGlobalQueue(); //从全局服务队列里弹出一个服务来执行
         if (!srv)
         {
+            cout << "Worker operator线程在等待，因为GlobalQueue是空的" << endl;
             Sunnet::inst->WorkerWait();
         }
         else
         {
+            cout << "服务队列里有消息了ProcessMsgs处理" << endl;
             srv->ProcessMsgs(eachNum);
             CheckAndPutGlobal(srv);
         }
