@@ -46,6 +46,25 @@ shared_ptr<BaseMsg> Service::PopMsg()
 void Service::OnInit()
 {
 	cout << "[" << id << "] OnInit" << endl;
+	//新建lua虚拟机
+	//创建lua_State对象
+	luaState = luaL_newstate();
+	//开启标准库
+	luaL_openlibs(luaState);
+	//执行Lua文件
+	string filename = "../service/"+*type+"/init.lua";
+	int isok = luaL_dofile(luaState,filename.data());
+	if(isok == 1){//若成功则返回值为0，失败为1
+		cout<<"run lua fail: "<<lua_tostring(luaState,-1)<<endl;
+	}
+	//调用lua函数
+	lua_getglobal(luaState,"OnInit");
+	lua_pushinteger(luaState,id);
+	isok = lua_pcall(luaState,1,0,0);
+	if(isok != 0){//若返回值为0则代表成功，否侧代表失败
+		cout<<"call lua OnInit fail "<<lua_tostring(luaState,-1)<<endl;
+	}
+
 	//开启监听
 	Sunnet::inst->Sunnet::Listen(8002, id);
 }
@@ -77,20 +96,26 @@ void Sunnet::Send(uint32_t toId,shared_ptr<BaseMsg> msg){
 //收到消息时触发
 void Service::OnMsg(shared_ptr<BaseMsg> msg)
 {
+	//SERVICE
+	if (msg->type == BaseMsg::TYPE::SERVICE)
+	{
+		auto m = dynamic_pointer_cast<ServiceMsg>(msg);
+		OnServiceMsg(m);
+	}
 	//SOCKET_ACCEPT
-	if (msg->type == BaseMsg::TYPE::SOCKET_ACCEPT)
+	else if (msg->type == BaseMsg::TYPE::SOCKET_ACCEPT)
 	{
 		auto m = dynamic_pointer_cast<SocketAcceptMsg>(msg);
 		cout << "new conn ACCEPT" << m->clientFd << endl;
+		OnAcceptMsg(m);
 	}
-	//cout << "SOCKET_RW m->isread..1" << endl;
-	//cout << msg->type << ".....jianghui" << endl;
 	//SOCKET_RW
 	else if (msg->type == BaseMsg::TYPE::SOCKET_RW)
 	{
-		cout << "SOCKET_RW m->isread..2" << endl;
+		cout << "SOCKET_RW m->isread" << endl;
 		auto m = dynamic_pointer_cast<SocketRWMsg>(msg);
-		if (m->isRead)
+		OnRWMsg(m);
+		/*	if (m->isRead)
 		{
 			cout << "SOCKET_RW m->isread" << endl;
 			char buff[512];
@@ -105,7 +130,7 @@ void Service::OnMsg(shared_ptr<BaseMsg> msg)
 				cout << "close" << m->fd << strerror(errno) << endl;
 				Sunnet::inst->CloseConn(m->fd);
 			}
-		}
+		}*/
 	}
 }
 //测试用
@@ -123,6 +148,14 @@ void Service::OnMsg(shared_ptr<BaseMsg> msg)
 void Service::OnExit()
 {
 	cout << "[" << id << "] onExit" << endl;
+	//调用lua函数
+	lua_getglobal(luaState,"OnExit");
+	int isok = lua_pcall(luaStatus,0,0,0);
+	if(isok != 0){
+		cout<<"call lua OnExit fail"<<lua_tostring(luaState,-1)<<endl;
+	}
+	//关闭虚拟机
+	lua_close(luaState);
 }
 //处理一条消息，返回值代表是否处理
 bool Service::ProcessMsg()
@@ -160,4 +193,83 @@ void Service::SetInGlobal(bool isIn)
 		inGlobal = isIn;
 	}
 	pthread_spin_unlock(&inGlobalLock);
+}
+//收到其他服务发来的消息
+void Service::OnServiceMsg(shared_ptr<ServiceMsg> msg)
+{
+	cout << "OnServiceMsg" << endl;
+}
+//新连接
+void Service::OnAcceptMsg(shared_ptr<SocketAcceptMsg> msg)
+{
+	cout << "OnAcceptMsg " << msg->clientFd << endl;
+	auto w = make_shared<ConnWriter>();
+	w->fd = msg->clientFd;
+	writers.emplace(msg->clientFd, w);
+}
+//套接字可读可写
+void Service::OnRWMsg(shared_ptr<SocketRWMsg> msg)
+{
+	int fd = msg->fd;
+	//可读
+	if (msg->isRead)
+	{
+		const int BUFFSIZE = 512;
+		char buff[BUFFSIZE];
+		int len = 0;
+		do
+		{
+			len = read(fd, &buff, BUFFSIZE);
+			if (len > 0)
+			{
+				OnSocketData(fd, buff, len);
+			}
+		} while (len == BUFFSIZE);
+		if (len <= 0 && errno != EAGAIN)
+		{
+			if (Sunnet::inst->GetConn(fd))
+			{ //加入判断是为了防止OnSocketClose执行了两次
+				OnSocketClose(fd);
+				Sunnet::inst->CloseConn(fd);
+			}
+		}
+	}
+	//可写
+	if (msg->isWrite)
+	{
+		if (Sunnet::inst->GetConn(fd))
+		{ //保证OnSocketWritable有效
+			OnSocketWritable(fd);
+		}
+	}
+}
+
+//收到客户端数据
+void Service::OnSocketData(int fd, const char *buff, int len)
+{
+	cout << "OnSocketData " << fd << "buff: " << buff << endl;
+	//用ConnWriter发送大量数据
+	char *writeBuff = new char[4200000];
+	writeBuff[4200000 - 1] = 'e';
+	int r = write(fd, writeBuff, 4200000);
+	cout << "write r: " << r << " " << strerror(errno) << endl;
+	auto w = writers[fd];
+	w->EntireWrite(shared_ptr<char>(writeBuff), 4200000);
+	w->LingerClose();
+	//echo
+	//char writeBuff[3] = {'l','p','y'};
+	//write(fd,&writeBuff,3};
+}
+//套接字可写
+void Service ::OnSocketWritable(int fd)
+{
+	cout << "OnSocketWritable:" << fd << endl;
+	auto w = writers[fd];
+	w->OnWriteable();
+}
+//关闭连接前
+void Service::OnSocketClose(int fd)
+{
+	cout << "OnSocketClose:" << fd << endl;
+	writers.erase(fd);
 }

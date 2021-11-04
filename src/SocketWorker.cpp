@@ -140,6 +140,7 @@ void SocketWorker::OnRW(shared_ptr<Conn> conn, bool r, bool w)
 {
     cout << "OnRW fd:" << conn->fd << endl;
     auto msg = make_shared<SocketRWMsg>();
+    msg->type = BaseMsg::TYPE::SOCKET_RW;
     msg->fd = conn->fd;
     msg->isRead = r;
     msg->isWrite = w;

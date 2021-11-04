@@ -25,9 +25,12 @@ void test()
 int main()
 {
     new Sunnet();
-
     Sunnet::inst->Start();
-    TestEcho();
+    //启动main服务
+    auto t = make_shared<string>("main");
+	Sunnet::inst->NewService(t);
+
+    //TestEcho();
     //TestSocketCtrl();
     // test();
     //开启系统后的一些逻辑
