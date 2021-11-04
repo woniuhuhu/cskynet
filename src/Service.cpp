@@ -3,7 +3,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <string.h>
-
+#include "LuaAPI.h"
 //构造函数
 Service::Service()
 {
@@ -51,6 +51,8 @@ void Service::OnInit()
 	luaState = luaL_newstate();
 	//开启标准库
 	luaL_openlibs(luaState);
+	//注册Sunnet系统API
+	LuaAPI::Register(luaState);
 	//执行Lua文件
 	string filename = "../service/"+*type+"/init.lua";
 	int isok = luaL_dofile(luaState,filename.data());
@@ -150,7 +152,7 @@ void Service::OnExit()
 	cout << "[" << id << "] onExit" << endl;
 	//调用lua函数
 	lua_getglobal(luaState,"OnExit");
-	int isok = lua_pcall(luaStatus,0,0,0);
+	int isok = lua_pcall(luaState,0,0,0);
 	if(isok != 0){
 		cout<<"call lua OnExit fail"<<lua_tostring(luaState,-1)<<endl;
 	}
