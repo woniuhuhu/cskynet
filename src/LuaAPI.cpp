@@ -79,18 +79,78 @@ int LuaAPI::Send(lua_State *luaState){
 	//无
 	return 0;
 }
+//写套接字
+int LuaAPI::Write(lua_State *luaState){
+	//参数个数
+	int num = lua_gettop(luaState);
+	//参数1：fd
+	if(lua_isinteger(luaState,1)==0){
+		lua_pushinteger(luaState,-1);
+		return 1;
+	}
+	int fd = lua_tointeger(luaState,1);
+	//参数2：buff
+	if(lua_isstring(luaState,2)==0){
+		lua_pushinteger(luaState,-1);
+		return 1;
+	}
+	size_t len = 0;
+	const char *buff = lua_tolstring(luaState,2,&len);
+	//处理
+	int r = write(fd,buff,len);
+	//返回值
+	lua_pushinteger(luaState,r);
+	return 1;
+}
+//开启网络监听
+int LuaAPI::Listen(lua_State *luaState){
+    //参数个数
+    int num = lua_gettop(luaState);
+    //参数1：端口
+    if(lua_isinteger(luaState, 1) == 0) {
+        lua_pushinteger(luaState, -1);
+        return 1;
+    }
+    int port = lua_tointeger(luaState, 1);
+    //参数2：服务Id
+    if(lua_isinteger(luaState, 2) == 0) {
+        lua_pushinteger(luaState, -1);
+        return 1;
+    }
+    int id = lua_tointeger(luaState, 2);
+    //处理
+    int fd = Sunnet::inst->Listen(port, id);
+    //返回值
+    lua_pushinteger(luaState, fd);
+    return 1;
+}
+//关闭连接
+int LuaAPI::CloseConn(lua_State *luaState){
+    //参数个数
+    int num = lua_gettop(luaState);
+    //参数1：fd
+    if(lua_isinteger(luaState, 1) == 0) {
+        return 0;
+    }
+    int fd = lua_tointeger(luaState, 1);
+    //处理
+    Sunnet::inst->CloseConn(fd);
+    //返回值
+    //（无）
+    return 0;
+}
 //注册lua模块
 void LuaAPI::Register(lua_State *luaState){
 	static luaL_Reg lualibs[] = {//用于注册函数的数组类型，每一项有两个参数，第一个代表lua中方法的名字，第二个对应c++方法
 		{"NewService",NewService},
 		{"KillService",KillService},
 		{"Send",Send},
-		//{"Listen",Listen},
-		//{"CloseConn",CloseConn},
-		//{"Write",Write},
+		{"Listen",Listen},
+		{"CloseConn",CloseConn},
+		{"Write",Write},
 		{NULL,NULL}//表示结束
 	};
 	luaL_newlib(luaState,lualibs);//在栈中创建一张表，把数组lualibs中的函数注册到表中
-	lua_setglobal(luaState,"sunnet");//将栈顶元素放入全局空间，并重新命名
+	lua_setglobal(luaState,"sunnet");//将栈顶元素(也就是那张表）放入全局空间，并重新命名为sunnet
 }
 

@@ -1,7 +1,8 @@
 print("run lua init.lua")
 
 function OnInit(id)
-	print("[lua] main OnInit id: "..id)
+	sunnet.NewService("chat")
+--[[	print("[lua] main OnInit id: "..id)
 	local ping1 = sunnet.NewService("ping");
 	print("[lua] new service ping1: "..ping1)
 
@@ -13,6 +14,7 @@ function OnInit(id)
 
 	sunnet.Send(ping1,pong,"start")
 	sunnet.Send(ping2,pong,"start")
+	]]
 end
 
 function OnExit()

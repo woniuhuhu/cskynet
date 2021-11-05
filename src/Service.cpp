@@ -68,7 +68,7 @@ void Service::OnInit()
 	}
 
 	//开启监听
-	Sunnet::inst->Sunnet::Listen(8002, id);
+	//Sunnet::inst->Sunnet::Listen(8002, id);
 }
 /* //发送消息
 void Sunnet::Send(uint32_t toId,shared_ptr<BaseMsg> msg){
@@ -215,6 +215,14 @@ void Service::OnAcceptMsg(shared_ptr<SocketAcceptMsg> msg)
 	auto w = make_shared<ConnWriter>();
 	w->fd = msg->clientFd;
 	writers.emplace(msg->clientFd, w);
+	 //调用Lua函数
+    lua_getglobal(luaState, "OnAcceptMsg");
+    lua_pushinteger(luaState, msg->listenFd);
+    lua_pushinteger(luaState, msg->clientFd);
+    int isok = lua_pcall(luaState, 2, 0, 0);
+    if(isok != 0){ //成功返回值为0，否则代表失败.
+         cout << "call lua OnAcceptMsg fail " << lua_tostring(luaState, -1) << endl;
+    }
 }
 //套接字可读可写
 void Service::OnRWMsg(shared_ptr<SocketRWMsg> msg)
@@ -256,7 +264,15 @@ void Service::OnRWMsg(shared_ptr<SocketRWMsg> msg)
 //收到客户端数据
 void Service::OnSocketData(int fd, const char *buff, int len)
 {
-	cout << "OnSocketData " << fd << "buff: " << buff << endl;
+	//收到客户端数据
+	lua_getglobal(luaState,"OnSocketData");
+	lua_pushinteger(luaState,fd);
+	lua_pushlstring(luaState,buff,len);
+	int isok = lua_pcall(luaState,2,0,0);
+	if(isok!=0){
+		cout<<"call lua OnSocketDta fail"<<lua_tostring(luaState,-1)<<endl;
+	}
+/*	cout << "OnSocketData " << fd << "buff: " << buff << endl;
 	//用ConnWriter发送大量数据
 	char *writeBuff = new char[4200000];
 	writeBuff[4200000 - 1] = 'e';
@@ -268,6 +284,7 @@ void Service::OnSocketData(int fd, const char *buff, int len)
 	//echo
 	//char writeBuff[3] = {'l','p','y'};
 	//write(fd,&writeBuff,3};
+	*/
 }
 //套接字可写
 void Service ::OnSocketWritable(int fd)
@@ -281,4 +298,11 @@ void Service::OnSocketClose(int fd)
 {
 	cout << "OnSocketClose:" << fd << endl;
 	writers.erase(fd);
+	//调用Lua函数
+    lua_getglobal(luaState, "OnSocketClose");
+    lua_pushinteger(luaState, fd);
+    int isok = lua_pcall(luaState, 1, 0, 0);
+    if(isok != 0){ //成功返回值为0，否则代表失败.
+         cout << "call lua OnSocketClose fail " << lua_tostring(luaState, -1) << endl;
+    }
 }
