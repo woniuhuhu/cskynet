@@ -199,7 +199,14 @@ void Service::SetInGlobal(bool isIn)
 //收到其他服务发来的消息
 void Service::OnServiceMsg(shared_ptr<ServiceMsg> msg)
 {
-	cout << "OnServiceMsg" << endl;
+	//调用Lua函数
+	lua_getglobal(luaState,"OnServiceMsg");//将lua OnServiceMsg函数压栈
+	lua_pushinteger(luaState,msg->source);
+	lua_pushlstring(luaState,msg->buff.get(),msg->size);
+	int isok = lua_pcall(luaState,2,0,0);
+	if(isok != 0){//若返回值为0，则代表成功，否则失败
+		cout<<"call lua OnServiceMsg fail"<<lua_tostring(luaState,-1)<<endl;
+	}
 }
 //新连接
 void Service::OnAcceptMsg(shared_ptr<SocketAcceptMsg> msg)

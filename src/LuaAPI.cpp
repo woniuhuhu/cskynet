@@ -3,6 +3,7 @@
 #include "Sunnet.h"
 #include <unistd.h>
 #include <cstring>
+#include <iostream>
 //开启新服务
 int LuaAPI::NewService(lua_State *luaState){
 	//参数个数
@@ -24,17 +25,72 @@ int LuaAPI::NewService(lua_State *luaState){
 	lua_pushinteger(luaState,id);
 	return 1;
 }
+//关闭服务
+int LuaAPI::KillService(lua_State *luaState){
+	//参数
+	int num = lua_gettop(luaState);//获取参数的个数
+	if(lua_isinteger(luaState,1)==0){
+		return 0;
+	}
+	int id = lua_tointeger(luaState,1);
+	//处理
+	Sunnet::inst->KillService(id);
+	//返回值
+	//无
+	return 0;
+}
+//发送消息
+int LuaAPI::Send(lua_State *luaState){
+	//参数总数
+	int num = lua_gettop(luaState);
+	if(num !=3){
+		cout<<"Send fail,num err"<<endl;
+		return 0;
+	}
+	//参数1：我是谁
+	if(lua_isinteger(luaState,1)==0){
+		cout<<"Send fail,arg1 er"<<endl;
+		return 0;
+	}
+	int source = lua_tointeger(luaState,1);
+	//参数2：发给谁
+	if(lua_isinteger(luaState,2)==0){
+		cout<<"Send fail arg2 er"<<endl;
+		return 0;
+	}
+	int toId = lua_tointeger(luaState,2);
+	//参数3：发送的内容
+	if(lua_isstring(luaState,3)==0){
+		cout<<"Send fail arg3 er"<<endl;
+		return 0;
+	}
+	size_t len = 0;
+	const char *buff = lua_tolstring(luaState,3,&len);
+	char* newstr = new char[len];
+	memcpy(newstr,buff,len);
+	//处理
+	auto msg = make_shared<ServiceMsg>();
+	msg->type = BaseMsg::TYPE::SERVICE;
+	msg->source = source;
+	msg->buff = shared_ptr<char>(newstr);
+	msg->size = len;
+	Sunnet::inst->Send(toId,msg);
+	//返回值
+	//无
+	return 0;
+}
 //注册lua模块
 void LuaAPI::Register(lua_State *luaState){
 	static luaL_Reg lualibs[] = {//用于注册函数的数组类型，每一项有两个参数，第一个代表lua中方法的名字，第二个对应c++方法
 		{"NewService",NewService},
-		//{"KillService",KillService},
-		//{"Send",Send},
+		{"KillService",KillService},
+		{"Send",Send},
 		//{"Listen",Listen},
 		//{"CloseConn",CloseConn},
 		//{"Write",Write},
-		//{NULL,NULL}//表示结束
+		{NULL,NULL}//表示结束
 	};
 	luaL_newlib(luaState,lualibs);//在栈中创建一张表，把数组lualibs中的函数注册到表中
 	lua_setglobal(luaState,"sunnet");//将栈顶元素放入全局空间，并重新命名
 }
+

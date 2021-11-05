@@ -10,6 +10,9 @@ function OnInit(id)
 
 	local pong = sunnet.NewService("ping")
 	print("[lua] new service pong: "..pong)
+
+	sunnet.Send(ping1,pong,"start")
+	sunnet.Send(ping2,pong,"start")
 end
 
 function OnExit()
